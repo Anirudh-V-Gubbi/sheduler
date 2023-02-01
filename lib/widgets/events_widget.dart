@@ -45,6 +45,7 @@ class _EventListState extends State<EventList> {
             title: tasklist[i]['title'],
             date: tasklist[i]['date'],
             time: tasklist[i]['time'],
+            repeat: tasklist[i]['repeat'],
           i: i,
           refreshlist: refreshList,
           editlist: editlist,
@@ -56,17 +57,19 @@ class _EventListState extends State<EventList> {
 
 
 class EventCard extends StatefulWidget {
-  EventCard({Key? key, required this.title, required this.date, required this.time, required this.i, required this.refreshlist, required this.editlist}) : super(key: key){
+  EventCard({Key? key, required this.title, required this.date, required this.time, required this.i, required this.repeat, required this.refreshlist, required this.editlist}) : super(key: key){
     calcTime();
   }
 
   final String title;
   String date;
   String time;
-  final i;
+  final bool repeat;
+  final int i;
   String timeRemainingMessage = "";
-  Function refreshlist;
-  Function editlist;
+  final Function refreshlist;
+  final Function editlist;
+  bool showRepeat = false;
 
   void calcTime()
   {
@@ -105,9 +108,21 @@ class EventCard extends StatefulWidget {
     date += '${dates[1]}/${dates[2]}';
 
     //time message
-    Duration timeRemaining = datex.difference(DateTime.now());
+    DateTime now = DateTime.now();
+    Duration timeRemaining = datex.difference(now);
 
     if(timeRemaining.isNegative) {
+      if(repeat) {
+        showRepeat = true;
+        DateTime temp = DateTime(now.year, now.month, now.day, datex.hour, datex.minute);
+        timeRemaining = temp.difference(now);
+
+        if(timeRemaining.isNegative) {
+          timeRemaining = (temp.add(const Duration(days: 1))).difference(now);
+          timeRemainingMessage = "${timeRemaining.inHours}Hrs ${timeRemaining.inMinutes % 60}mins";
+          return;
+        }
+      }
       timeRemainingMessage = "Expired!";
     }
     else {
@@ -131,7 +146,6 @@ class EventCard extends StatefulWidget {
 }
 
 class _EventCardState extends State<EventCard> {
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -161,12 +175,12 @@ class _EventCardState extends State<EventCard> {
             ],
           ),
           subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                widget.date
-              ),
-              const SizedBox(
-                width: 100,
+                widget.showRepeat
+                ? "Repeat Everyday"
+                : widget.date
               ),
               Text(
                 widget.time

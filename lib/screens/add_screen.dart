@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:scheduler/sort_tasks.dart';
 
 class addscreen extends StatefulWidget {
   addscreen({Key? key, required this.tasklist, required this.refreshlist}) : super(key: key);
@@ -19,6 +20,13 @@ class _addscreenState extends State<addscreen> {
 
   TimeOfDay? time = TimeOfDay.now();
   DateTime _dateTime = DateTime.now();
+  ValueNotifier repeat = ValueNotifier<bool>(false);
+
+  @override
+  void initState()
+  {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -240,6 +248,34 @@ class _addscreenState extends State<addscreen> {
                       ),
                     ),
                     Padding(
+                      padding: const EdgeInsets.only(top: 20.0, left: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Repeat",
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 24.0),
+                            child: ValueListenableBuilder(
+                              valueListenable: repeat,
+                              builder: (context, repeatValue, _) =>
+                                Checkbox(
+                                  value: repeat.value,
+                                  onChanged: (value) {
+                                    repeat.value = value;
+                                  }
+                                ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
                       padding: const EdgeInsets.only(top: 75.0),
                       child: OutlinedButton(
                           onPressed: () async{
@@ -247,27 +283,12 @@ class _addscreenState extends State<addscreen> {
                                 {'title': titleCtrl.text,
                                   'date': '${_dateTime.day}/${_dateTime
                                       .month}/${_dateTime.year}',
-                                  'time': '${time?.hour}:${time?.minute}'
+                                  'time': '${time?.hour}:${time?.minute}',
+                                  'repeat': repeat.value
                                 }
                             );
 
-                            widget.tasklist.sort(
-                                    (a, b) {
-                                  List a_dates = a['date'].toString().split("/");
-                                  List a_times = a['time'].toString().split(":");
-                                  List b_dates = b['date'].toString().split("/");
-                                  List b_times = b['time'].toString().split(":");
-
-                                  DateTime a_date = DateTime(int.parse(a_dates[2]), int.parse(a_dates[1]), int.parse(a_dates[0]),
-                                      int.parse(a_times[0]), int.parse(a_times[1])
-                                  );
-                                  DateTime b_date = DateTime(int.parse(b_dates[2]), int.parse(b_dates[1]), int.parse(b_dates[0]),
-                                      int.parse(b_times[0]), int.parse(b_times[1])
-                                  );
-
-                                  return a_date.compareTo(b_date);
-                                }
-                            );
+                            widget.tasklist = sortTasks(widget.tasklist);
 
                             var box = await Hive.openBox('task');
                             await box.put('tasks', widget.tasklist);

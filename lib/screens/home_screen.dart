@@ -2,6 +2,7 @@ import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scheduler/screens/add_screen.dart';
+import 'package:scheduler/sort_tasks.dart';
 import 'package:scheduler/widgets/events_widget.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -30,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var box = await Hive.openBox('task');
 
       List tasklist = box.get('tasks', defaultValue: []);
-      return tasklist;
+      return sortTasks(tasklist);
     }
     catch(e){
       print("ERROR: Failed to initialise the list");
