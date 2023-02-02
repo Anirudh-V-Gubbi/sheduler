@@ -6,7 +6,7 @@ import 'package:scheduler/sort_tasks.dart';
 import 'package:scheduler/widgets/events_widget.dart';
 
 class MyHomePage extends StatefulWidget {
-   MyHomePage({Key? key}) : super(key: key);
+  MyHomePage({Key? key}) : super(key: key);
 
   final String title = 'Schedule';
 
@@ -15,81 +15,74 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   Future? future;
   List tasks = [null];
 
-  void refreshlist(List newlist)
-  {
+  void refreshlist(List newlist) {
     setState(() {
       tasks = newlist;
     });
   }
 
-  Future? getTasks() async{
-    try{
+  Future? getTasks() async {
+    try {
       var box = await Hive.openBox('task');
 
       List tasklist = box.get('tasks', defaultValue: []);
       return sortTasks(tasklist);
-    }
-    catch(e){
+    } catch (e) {
       print("ERROR: Failed to initialise the list");
     }
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     future = getTasks();
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: Colors.amber,
       ),
       body: FutureBuilder(
-      future: future,
-      builder: (context, taskdata){
-        if(taskdata.connectionState == ConnectionState.done){
-          if(taskdata.hasError){
-            return const Text("Failed to recieve task data");
-          }
-          else if(taskdata.hasData){
-             tasks = taskdata.data as List;
+          future: future,
+          builder: (context, taskdata) {
+            if (taskdata.connectionState == ConnectionState.done) {
+              if (taskdata.hasError) {
+                return const Text("Failed to recieve task data");
+              } else if (taskdata.hasData) {
+                tasks = taskdata.data as List;
 
-            return EventList(listoftask: tasks);
-          }
-          else{
-
-             return const Center(child: Text("NO TASKS"));
-           }
-          }
-          return const Center(child: CircularProgressIndicator());
-        }
-      ),
+                return EventList(listoftask: tasks);
+              } else {
+                return const Center(child: Text("NO TASKS"));
+              }
+            }
+            return const Center(child: CircularProgressIndicator());
+          }),
       floatingActionButton: DraggableFab(
         initPosition: Offset(0.0, MediaQuery.of(context).size.height * 0.9),
         child: OutlinedButton(
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.amber),
-            shape: MaterialStateProperty.all(const CircleBorder()),
-            fixedSize: MaterialStateProperty.all(const Size.fromRadius(30.0))
-          ),
+              backgroundColor: MaterialStateProperty.all(Colors.amber),
+              shape: MaterialStateProperty.all(const CircleBorder()),
+              fixedSize:
+                  MaterialStateProperty.all(const Size.fromRadius(30.0))),
           child: const Icon(
-              Icons.add,
+            Icons.add,
             size: 35.0,
             color: Colors.white,
           ),
-          onPressed: (){
+          onPressed: () {
             Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) =>
-                addscreen(tasklist: tasks, refreshlist: refreshlist))
-            );  
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        addscreen(tasklist: tasks, refreshlist: refreshlist)));
           },
         ),
       ),

@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'screens/launch_screen.dart';
 
-void main() async{
+void main() async {
   await Hive.initFlutter();
   runApp(const MyApp());
 }
@@ -15,14 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Schedule',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const launchScreen()
-    );
+        title: 'Schedule',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const launchScreen());
   }
 }
-
-

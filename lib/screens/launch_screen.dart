@@ -10,28 +10,25 @@ class launchScreen extends StatefulWidget {
 }
 
 class _launchScreenState extends State<launchScreen> {
-
   @override
-  void initState()
-  {
+  void initState() {
     super.initState();
     _tohome();
   }
 
-  void _tohome() async{
-    await Future.delayed(const Duration(milliseconds: 2000), (){});
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyHomePage()));
+  void _tohome() async {
+    await Future.delayed(const Duration(milliseconds: 2000), () {});
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => MyHomePage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[Icon(Icons.home)],
-        )
-      )
-    );
+        body: Center(
+            child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const <Widget>[Icon(Icons.home)],
+    )));
   }
 }
