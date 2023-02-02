@@ -122,6 +122,11 @@ class EventCard extends StatefulWidget {
           timeRemainingMessage = "${timeRemaining.inHours}Hrs ${timeRemaining.inMinutes % 60}mins";
           return;
         }
+        else{
+          timeRemaining = temp.difference(now);
+          timeRemainingMessage = "${timeRemaining.inHours}Hrs ${timeRemaining.inMinutes % 60}mins";
+          return;
+        }
       }
       timeRemainingMessage = "Expired!";
     }

@@ -1,67 +1,42 @@
 List sortTasks(List tasks)
 {
   return tasks..sort(
-    (a, b) {
-      List a_dates = a['date'].toString().split("/");
-      List a_times = a['time'].toString().split(":");
-      List b_dates = b['date'].toString().split("/");
-      List b_times = b['time'].toString().split(":");
+    (a, b) => calcTime(a).compareTo(calcTime(b))
+  );
+}
 
-      DateTime a_date = DateTime(int.parse(a_dates[2]), int.parse(a_dates[1]), int.parse(a_dates[0]),
-          int.parse(a_times[0]), int.parse(a_times[1])
+Duration calcTime(dynamic task)
+  {
+    List<String> dates = task['date'].split("/");
+    List<String> times = task['time'].split(":");
+
+    DateTime datex = DateTime(
+      int.parse(dates[2]),
+      int.parse(dates[1]),
+      int.parse(dates[0]),
+      int.parse(times[0]),
+      int.parse(times[1])
       );
-      DateTime b_date = DateTime(int.parse(b_dates[2]), int.parse(b_dates[1]), int.parse(b_dates[0]),
-          int.parse(b_times[0]), int.parse(b_times[1])
-      );
 
-      if(a['repeat'] == false && b['repeat'] == false) {
-        return a_date.compareTo(b_date);
-      }
-      else if(a['repeat'] == true && b['repeat'] == false) {
-        DateTime now = DateTime.now();
-        if(now.isAfter(a_date)) {
-          DateTime temp = DateTime(now.year, now.month, now.day + 1, a_date.hour, a_date.minute);
+    DateTime now = DateTime.now();
+    Duration timeRemaining = datex.difference(now);
 
-          return temp.compareTo(b_date);
-        }
-        else {
-          return a_date.compareTo(b_date);
-        }
-        
-      }
-      else if(a['repeat'] == false && b['repeat'] == true) {
-        DateTime now = DateTime.now();
-        if(now.isAfter(b_date)) {
-          DateTime temp = DateTime(now.year, now.month, now.day + 1, b_date.hour, b_date.minute);
+    if(timeRemaining.isNegative) {
+      if(task["repeat"]) {
+        DateTime temp = DateTime(now.year, now.month, now.day, datex.hour, datex.minute);
+        timeRemaining = temp.difference(now);
 
-          return a_date.compareTo(temp);
+        if(timeRemaining.isNegative) {
+          timeRemaining = (temp.add(const Duration(days: 1))).difference(now);
         }
-        else {
-          return a_date.compareTo(b_date);
+        else{
+          timeRemaining = temp.difference(now);
         }
       }
       else {
-        DateTime now = DateTime.now();
-        if(now.isAfter(a_date) && !now.isAfter(b_date)) {
-          DateTime temp = DateTime(now.year, now.month, now.day + 1, a_date.hour, a_date.minute);
-
-          return temp.compareTo(b_date);
-        }
-        else if(!now.isAfter(a_date) && now.isAfter(b_date)) {
-          DateTime temp = DateTime(now.year, now.month, now.day + 1, b_date.hour, b_date.minute);
-
-          return a_date.compareTo(temp);
-        }
-        else if(now.isAfter(a_date) && now.isAfter(b_date)) {
-          DateTime atemp = DateTime(now.year, now.month, now.day + 1, a_date.hour, a_date.minute);
-          DateTime btemp = DateTime(now.year, now.month, now.day + 1, b_date.hour, b_date.minute);
-
-          return atemp.compareTo(btemp);
-        }
-        else {
-          return a_date.compareTo(b_date);
-        }
+        timeRemaining = Duration.zero;
       }
     }
-  );
-}
+
+    return timeRemaining;
+  }
