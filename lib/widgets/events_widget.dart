@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scheduler/screens/edit_screen.dart';
+import 'package:scheduler/task.dart';
 
-List tasklist = [];
+List<Task> tasklist = [];
 
 class EventList extends StatefulWidget {
   EventList({Key? key, required this.listoftask}) : super(key: key) {
     tasklist = listoftask;
   }
-  final listoftask;
+  final List<Task> listoftask;
 
   @override
   _EventListState createState() => _EventListState();
@@ -37,10 +38,10 @@ class _EventListState extends State<EventList> {
     return ListView.builder(
         itemCount: tasklist.length,
         itemBuilder: (context, i) => EventCard(
-              title: tasklist[i]['title'],
-              date: tasklist[i]['date'],
-              time: tasklist[i]['time'],
-              repeat: tasklist[i]['repeat'],
+              title: tasklist[i].title,
+              date: tasklist[i].date,
+              time: tasklist[i].time,
+              repeat: tasklist[i].repeat,
               i: i,
               refreshlist: refreshList,
               editlist: editlist,

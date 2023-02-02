@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scheduler/sort_tasks.dart';
+import 'package:scheduler/task.dart';
 
 class addscreen extends StatefulWidget {
   addscreen({Key? key, required this.tasklist, required this.refreshlist})
       : super(key: key);
 
-  List tasklist;
+  List<Task> tasklist;
   Function refreshlist;
 
   @override
@@ -255,17 +256,17 @@ class _addscreenState extends State<addscreen> {
                     padding: const EdgeInsets.only(top: 75.0),
                     child: OutlinedButton(
                       onPressed: () async {
-                        widget.tasklist.add({
-                          'title': titleCtrl.text,
-                          'date':
+                        widget.tasklist.add(Task(
+                          title: titleCtrl.text,
+                          date:
                               '${_dateTime.day}/${_dateTime.month}/${_dateTime.year}',
-                          'time': '${time?.hour}:${time?.minute}',
-                          'repeat': repeat.value
-                        });
+                          time: '${time?.hour}:${time?.minute}',
+                          repeat: repeat.value
+                        ));
 
                         widget.tasklist = sortTasks(widget.tasklist);
 
-                        var box = await Hive.openBox('task');
+                        var box = Hive.box('task');
                         await box.put('tasks', widget.tasklist);
 
                         widget.refreshlist(widget.tasklist);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scheduler/sort_tasks.dart';
+import 'package:scheduler/task.dart';
 
 class editscreen extends StatefulWidget {
   editscreen(
@@ -9,9 +10,9 @@ class editscreen extends StatefulWidget {
       required this.i,
       required this.tasklist,
       required this.refreshlist})
-      : date = task['date'].toString().split("/"),
-        times = task['time'].toString().split(":"),
-        titleCtrl = TextEditingController(text: task['title']),
+      : date = task.date.toString().split("/"),
+        times = task.time.toString().split(":"),
+        titleCtrl = TextEditingController(text: task.title),
         super(key: key) {
     time = TimeOfDay(
         hour: int.parse(times[0].toString()),
@@ -20,11 +21,11 @@ class editscreen extends StatefulWidget {
         DateTime(int.parse(date[2]), int.parse(date[1]), int.parse(date[0]));
   }
 
-  final task;
+  final Task task;
   final List date;
   final List times;
   final i;
-  List tasklist;
+  List<Task> tasklist;
   Function refreshlist;
 
   TimeOfDay? time;
@@ -42,7 +43,7 @@ class _editscreenState extends State<editscreen> {
   @override
   void initState() {
     super.initState();
-    repeat.value = widget.task['repeat'];
+    repeat.value = widget.task.repeat;
   }
 
   @override
@@ -276,13 +277,13 @@ class _editscreenState extends State<editscreen> {
                     padding: const EdgeInsets.only(top: 75.0),
                     child: OutlinedButton(
                       onPressed: () async {
-                        widget.tasklist[widget.i] = {
-                          'title': widget.titleCtrl.text,
-                          'date':
-                              '${widget._dateTime?.day}/${widget._dateTime?.month}/${widget._dateTime?.year}',
-                          'time': '${widget.time?.hour}:${widget.time?.minute}',
-                          'repeat': repeat.value
-                        };
+                        widget.tasklist[widget.i] = Task(
+                          title: widget.titleCtrl.text,
+                          date:
+                             '${widget._dateTime?.day}/${widget._dateTime?.month}/${widget._dateTime?.year}',
+                          time: '${widget.time?.hour}:${widget.time?.minute}',
+                          repeat: repeat.value
+                        );
 
                         widget.tasklist = sortTasks(widget.tasklist);
 

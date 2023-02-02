@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:scheduler/screens/add_screen.dart';
 import 'package:scheduler/sort_tasks.dart';
+import 'package:scheduler/task.dart';
 import 'package:scheduler/widgets/events_widget.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -16,9 +17,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Future? future;
-  List tasks = [null];
+  List<Task> tasks = [];
 
-  void refreshlist(List newlist) {
+  void refreshlist(List<Task> newlist) {
     setState(() {
       tasks = newlist;
     });
@@ -26,9 +27,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future? getTasks() async {
     try {
-      var box = await Hive.openBox('task');
+      var box = Hive.box('task');
 
-      List tasklist = box.get('tasks', defaultValue: []);
+      List<Task> tasklist = [];
+      List<dynamic> tempList = box.get('tasks', defaultValue: []);
+      for (var element in tempList) {tasklist.add(element as Task);}
+
       return sortTasks(tasklist);
     } catch (e) {
       print("ERROR: Failed to initialise the list");
@@ -55,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if (taskdata.hasError) {
                 return const Text("Failed to recieve task data");
               } else if (taskdata.hasData) {
-                tasks = taskdata.data as List;
+                tasks = taskdata.data as List<Task>;
 
                 return EventList(listoftask: tasks);
               } else {
